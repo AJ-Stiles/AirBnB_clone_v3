@@ -86,3 +86,45 @@ class TestFileStorage(unittest.TestCase):
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get_existing_object(self):
+        """Test that get returns an existing object by class and ID"""
+        # Create an object (e.g., User)
+        obj = User()
+        obj.id = "test_id"
+        models.storage.new(obj)
+        models.storage.save()
+        retrieved_obj = models.storage.get(User, "test_id")
+        self.assertEqual(retrieved_obj, obj)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get_non_existing_object(self):
+        """Test that get returns None for a non-existing object"""
+        retrieved_obj = models.storage.get(User, "non_existing_id")
+        self.assertIsNone(retrieved_obj)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count_objects_by_class(self):
+        """Test that count returns the correct count of objects by class"""
+        # Create several objects (e.g., User)
+        for _ in range(5):
+            obj = User()
+            models.storage.new(obj)
+        models.storage.save()
+        count = models.storage.count(User)
+        self.assertEqual(count, 5)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count_all_objects(self):
+        """Test that count returns the correct count of all objects"""
+        # Create objects of various classes
+        obj1 = User()
+        obj2 = Place()
+        obj3 = Review()
+        models.storage.new(obj1)
+        models.storage.new(obj2)
+        models.storage.new(obj3)
+        models.storage.save()
+        count = models.storage.count()
+        self.assertEqual(count, 3)
